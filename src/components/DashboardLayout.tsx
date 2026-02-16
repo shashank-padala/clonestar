@@ -1,9 +1,10 @@
 "use client";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Video, User, Mic, Settings, Zap, LogOut, Menu } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 const navItems = [
   { label: "Generate", path: "/dashboard/generate", icon: Zap },
@@ -15,11 +16,40 @@ const navItems = [
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState<{ email?: string; id: string } | null>(null);
+  const [profile, setProfile] = useState<{ full_name: string | null } | null>(null);
+
+  const supabase = createClient();
+
+  useEffect(() => {
+    const init = async () => {
+      const { data: { user: u } } = await supabase.auth.getUser();
+      setUser(u ?? null);
+      if (u) {
+        const { data: p } = await supabase.from("profiles").select("full_name").eq("id", u.id).single();
+        setProfile(p ?? null);
+      } else {
+        setProfile(null);
+      }
+    };
+    init();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => init());
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push("/");
+    router.refresh();
+  };
+
+  const displayName = profile?.full_name?.trim() || user?.email?.split("@")[0] || "User";
+  const initials = displayName.slice(0, 2).toUpperCase();
 
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
@@ -27,7 +57,6 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={`fixed lg:sticky top-0 left-0 z-50 h-screen w-64 flex-shrink-0 border-r border-border bg-sidebar flex flex-col transition-transform duration-300 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
@@ -64,22 +93,25 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
         <div className="px-3 py-4 border-t border-border">
           <div className="flex items-center gap-3 px-3 py-2">
             <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center text-xs font-semibold text-secondary-foreground">
-              JD
+              {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">John Doe</p>
-              <p className="text-xs text-muted-foreground truncate">john@example.com</p>
+              <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email ?? "—"}</p>
             </div>
-            <button className="text-muted-foreground hover:text-foreground transition-colors">
+            <button
+              type="button"
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              onClick={handleSignOut}
+              aria-label="Sign out"
+            >
               <LogOut className="h-4 w-4" />
             </button>
           </div>
         </div>
       </aside>
 
-      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile header */}
         <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-border bg-background/80 backdrop-blur-lg sticky top-0 z-30">
           <button onClick={() => setSidebarOpen(true)} className="text-foreground">
             <Menu className="h-5 w-5" />

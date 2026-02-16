@@ -22,13 +22,31 @@ const stats = [
   { value: "98%", label: "Satisfaction Rate" },
 ];
 
+const DRAFT_KEY = "clonestar:generate-draft";
+
 export default function Landing() {
   const [loginOpen, setLoginOpen] = useState(false);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [format, setFormat] = useState("16:9");
+  const [language, setLanguage] = useState("en");
+  const [length, setLength] = useState("60");
   const router = useRouter();
 
   const handleLogin = () => {
     setLoginOpen(false);
     router.push("/dashboard/generate");
+  };
+
+  const handleGenerateClick = () => {
+    try {
+      sessionStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify({ youtubeUrl, format, language, length })
+      );
+    } catch {
+      // ignore
+    }
+    setLoginOpen(true);
   };
 
   return (
@@ -63,16 +81,21 @@ export default function Landing() {
           </p>
           <div className="glass-card p-6 max-w-2xl mx-auto animate-fade-in" style={{ animationDelay: "0.3s" }}>
             <div className="space-y-4">
-              <Input placeholder="Paste YouTube link or transcript..." className="h-12 bg-secondary/50 border-border text-base" />
+              <Input
+                placeholder="Paste YouTube link or transcript..."
+                className="h-12 bg-secondary/50 border-border text-base"
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+              />
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <Select>
+                <Select value={format} onValueChange={setFormat}>
                   <SelectTrigger className="bg-secondary/50 border-border"><SelectValue placeholder="Format" /></SelectTrigger>
                   <SelectContent className="bg-popover border-border">
                     <SelectItem value="9:16">Shorts (9:16)</SelectItem>
                     <SelectItem value="16:9">YouTube (16:9)</SelectItem>
                   </SelectContent>
                 </Select>
-                <Select>
+                <Select value={language} onValueChange={setLanguage}>
                   <SelectTrigger className="bg-secondary/50 border-border"><SelectValue placeholder="Language" /></SelectTrigger>
                   <SelectContent className="bg-popover border-border">
                     <SelectItem value="en">English</SelectItem>
@@ -82,7 +105,7 @@ export default function Landing() {
                     <SelectItem value="fr">French</SelectItem>
                   </SelectContent>
                 </Select>
-                <Select>
+                <Select value={length} onValueChange={setLength}>
                   <SelectTrigger className="bg-secondary/50 border-border"><SelectValue placeholder="Length" /></SelectTrigger>
                   <SelectContent className="bg-popover border-border">
                     <SelectItem value="60">60 seconds</SelectItem>
@@ -91,7 +114,7 @@ export default function Landing() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button className="w-full h-12 text-base font-semibold animate-pulse-glow" onClick={() => setLoginOpen(true)}>
+              <Button className="w-full h-12 text-base font-semibold animate-pulse-glow" onClick={handleGenerateClick}>
                 Generate Video <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>

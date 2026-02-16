@@ -1,5 +1,23 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+**clonestar** — AI Avatar Video Studio: paste a YouTube link or transcript, pick avatar and voice, and generate AI avatar videos (OpenAI script, ElevenLabs voice, HeyGen video).
+
+## Setup
+
+1. **Supabase** — Create a project at [supabase.com](https://supabase.com). Run the migration:
+   - In Dashboard: SQL Editor → run contents of `supabase/migrations/001_initial.sql`.
+   - Create Storage buckets: `avatars` (public) and `generated-videos` (public), with RLS so users can read/write only their own folder `{user_id}/*`.
+
+2. **Environment** — Copy `.env.local.example` to `.env.local` and set:
+   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+   - `OPENAI_API_KEY` (or add per-user in Settings)
+   - Users add ElevenLabs and HeyGen API keys in **Settings** in the app.
+
+3. **HeyGen webhook** — Deploy the Edge Function and register the URL in HeyGen:
+   - `supabase functions deploy heygen-webhook --no-verify-jwt`
+   - URL: `https://<project-ref>.supabase.co/functions/v1/heygen-webhook`
+   - In HeyGen Dashboard → Webhooks → Add endpoint → subscribe to `avatar_video.success` and `avatar_video.fail`.
+
 ## Getting Started
 
 First, run the development server:
