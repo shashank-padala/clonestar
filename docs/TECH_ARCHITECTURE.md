@@ -155,7 +155,7 @@ RLS: all tables scoped by `auth.uid() = user_id`.
 
 | Source | Use | Config |
 |--------|-----|--------|
-| Supabase | Auth, Postgres, Storage, Edge | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` |
+| Supabase | Auth, Postgres, Storage, Edge | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY` |
 | OpenAI | Script generation | `OPENAI_API_KEY` or user key in `profiles.openai_api_key` |
 | ElevenLabs | TTS | User key in `profiles.elevenlabs_api_key` |
 | HeyGen | Video generation, webhook | User key in `profiles.heygen_api_key`; webhook URL = Edge Function URL |

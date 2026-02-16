@@ -9,7 +9,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
    - Create Storage buckets: `avatars` (public) and `generated-videos` (public), with RLS so users can read/write only their own folder `{user_id}/*`.
 
 2. **Environment** — Copy `.env.local.example` to `.env.local` and set:
-   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`
    - `OPENAI_API_KEY` (or add per-user in Settings)
    - Users add ElevenLabs and HeyGen API keys in **Settings** in the app.
 

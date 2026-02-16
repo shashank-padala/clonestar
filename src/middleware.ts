@@ -7,8 +7,8 @@ export async function middleware(request: NextRequest) {
   });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseAnonKey) {
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!supabaseUrl || !publishableKey) {
     if (request.nextUrl.pathname.startsWith("/dashboard")) {
       return NextResponse.redirect(new URL("/", request.url));
     }
@@ -17,7 +17,7 @@ export async function middleware(request: NextRequest) {
 
   const supabase = createServerClient(
     supabaseUrl,
-    supabaseAnonKey,
+    publishableKey,
     {
       cookies: {
         getAll() {
